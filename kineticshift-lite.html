@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KineticShift Lite</title>
+<meta name="theme-color" content="#003087">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KineticShift Lite">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nhs:#003087;--nhs2:#005EB8;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--blue:#3B82F6;
+  --bg:#f0f4f8;--surface:#ffffff;--surface2:#f8fafc;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --txt1:#0d1117;--txt2:#4a5568;--txt3:#94a3b8;
+  --safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);
+  --radius:14px;--radius-sm:10px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+    --txt1:#e6edf3;--txt2:#8b949e;--txt3:#484f58;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--txt1);overflow-x:hidden;}
+body{padding-bottom:calc(24px + var(--safe-bottom));}
+
+/* ── HEADER ── */
+.header{background:var(--nhs);padding:calc(var(--safe-top)+12px) 16px 12px;box-shadow:0 2px 8px rgba(0,48,135,0.4);}
+.header-inner{display:flex;align-items:center;justify-content:space-between;}
+.app-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.app-name span{color:#F59E0B;}
+.lite-badge{background:rgba(255,255,255,0.2);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px;margin-left:5px;vertical-align:middle;}
+.app-sub{font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px;}
+.month-nav{display:flex;align-items:center;gap:8px;}
+.nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.nav-btn:active{background:rgba(255,255,255,0.3);}
+.month-label{font-size:13px;font-weight:500;color:#fff;min-width:108px;text-align:center;}
+
+/* ── TODAY / TOMORROW ── */
+.tt-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);}
+.tt-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;}
+.tt-card.today-card{border-color:var(--amber);}
+.tt-card.tomorrow-card{border-color:var(--blue);}
+.tt-when{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;}
+.tt-name{font-size:14px;font-weight:700;color:var(--txt1);}
+.tt-time{font-size:11px;color:var(--txt2);font-family:'DM Mono',monospace;margin-top:2px;}
+.tt-none{font-size:12px;color:var(--txt3);font-style:italic;}
+
+/* ── LEGEND / TOOLBAR ── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);}
+.toolbar-left{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt2);}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.manage-btn{background:var(--nhs);color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* ── CALENDAR ── */
+.cal-section{padding:10px 12px;background:var(--surface);}
+.day-hdr{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
+.dh{text-align:center;font-size:10px;font-weight:600;color:var(--txt3);padding:2px 0;text-transform:uppercase;letter-spacing:0.5px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cell{min-height:72px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--surface2);border:1px solid var(--border);user-select:none;transition:transform 0.1s;overflow:hidden;padding:3px;}
+.cell:active{transform:scale(0.88);}
+.cell.empty{cursor:default;background:transparent;border:none;}
+.cell.is-today{border:2px solid var(--amber);}
+.cell.is-tomorrow{border:2px solid var(--blue);}
+.cell.selected{box-shadow:0 0 0 3px rgba(59,130,246,0.25);}
+.cn{font-size:11px;font-weight:600;color:var(--txt2);line-height:1;}
+.cl{font-size:9px;font-weight:700;text-transform:uppercase;margin-top:2px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;line-height:1.2;}
+.ct{font-size:8px;font-family:'DM Mono',monospace;margin-top:1px;opacity:0.8;}
+
+/* ── DETAIL PANEL ── */
+.detail-panel{background:var(--surface);border-top:1px solid var(--border);border-bottom:3px solid var(--blue);display:none;}
+.detail-panel.open{display:block;}
+.dp-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.dp-nav{width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:var(--surface);color:var(--txt1);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dp-nav:active{background:var(--border);}
+.dp-title{font-size:14px;font-weight:600;color:var(--txt1);flex:1;text-align:center;}
+.dp-close{width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--txt2);background:var(--surface);flex-shrink:0;}
+.dp-close:active{background:var(--border);}
+.dp-body{padding:14px 16px;}
+.dp-label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.dp-row{margin-bottom:16px;}
+.shift-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.s-btn{padding:9px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border2);color:var(--txt2);background:var(--surface2);display:flex;align-items:center;gap:5px;}
+.s-btn.active{border-width:2px;}
+.s-btn-clear{color:var(--txt3);}
+
+/* ── UNLOCK ROW (in detail panel) ── */
+.unlock-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--nhs);border-radius:var(--radius-sm);margin-top:4px;}
+.unlock-txt{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.4;}
+.unlock-txt strong{color:#fff;display:block;font-size:13px;}
+.unlock-btn-sm{background:#F59E0B;color:#000;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-left:12px;}
+
+/* ── MANAGE SHIFTS MODAL ── */
+#manage-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9998;align-items:flex-end;justify-content:center;}
+#manage-modal.show{display:flex;}
+.manage-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.manage-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.manage-title{font-size:17px;font-weight:700;color:var(--txt1);}
+.manage-x{width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--txt2);}
+.manage-sub{font-size:12px;color:var(--txt2);margin-bottom:14px;line-height:1.5;}
+.shift-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.shift-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.si-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0;}
+.si-name{font-size:13px;font-weight:600;color:var(--txt1);flex:1;}
+.si-time{font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace;}
+.si-del{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--red);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.add-form-title{font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.form-row{margin-bottom:10px;}
+.form-row label{display:block;font-size:11px;font-weight:600;color:var(--txt3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.form-row input{width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--txt1);font-family:'Inter',sans-serif;}
+.form-row input[type=time]{font-family:'DM Mono',monospace;font-size:15px;}
+.form-row input:focus{outline:2px solid var(--blue);border-color:transparent;}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0;}
+.swatch{width:30px;height:30px;border-radius:7px;cursor:pointer;border:3px solid transparent;transition:transform 0.1s;}
+.swatch.picked{border-color:var(--txt1);transform:scale(1.15);}
+.add-btn{width:100%;padding:12px;background:var(--nhs);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+.add-btn:active{opacity:0.9;}
+.no-shifts-hint{font-size:12px;color:var(--txt3);text-align:center;padding:10px;font-style:italic;}
+
+/* ── PAYWALL MODAL ── */
+#paywall{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9999;align-items:flex-end;justify-content:center;}
+#paywall.show{display:flex;}
+.pw-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom));width:100%;max-width:480px;}
+.pw-lock{font-size:36px;text-align:center;margin-bottom:8px;}
+.pw-title{font-size:19px;font-weight:700;color:var(--txt1);text-align:center;margin-bottom:6px;}
+.pw-sub{font-size:13px;color:var(--txt2);text-align:center;line-height:1.55;margin-bottom:18px;}
+.pw-feats{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:4px 0;margin-bottom:18px;}
+.pw-feat{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--txt2);}
+.pw-feat:last-child{border-bottom:none;}
+.pw-feat .fi{font-size:15px;width:22px;text-align:center;}
+.pw-feat strong{color:var(--txt1);}
+.pw-price{text-align:center;margin-bottom:16px;}
+.pw-amount{font-size:36px;font-weight:700;color:var(--txt1);font-family:'DM Mono',monospace;line-height:1;}
+.pw-per{font-size:13px;color:var(--txt3);margin-top:4px;}
+.pw-per b{color:var(--green);}
+.pw-btn{width:100%;padding:15px;background:var(--nhs);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.pw-dismiss{width:100%;padding:12px;background:transparent;color:var(--txt3);border:1px solid var(--border2);border-radius:12px;font-size:13px;cursor:pointer;}
+.pw-tagline{text-align:center;font-size:11px;color:var(--txt3);margin-top:12px;font-style:italic;}
+
+/* ── UPGRADE STRIP ── */
+.upgrade-strip{margin:10px 12px 4px;background:var(--nhs);border-radius:var(--radius);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.us-left .us-title{font-size:13px;font-weight:700;color:#fff;}
+.us-left .us-sub{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.us-btn{background:#F59E0B;color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.footer-note{text-align:center;padding:10px 20px 4px;font-size:10px;color:var(--txt3);}
+</style>
+</head>
+<body>
+
+<!-- ═══ PAYWALL ═══ -->
+<div id="paywall">
+  <div class="pw-sheet">
+    <div class="pw-lock">💷</div>
+    <div class="pw-title">Pay features — Full version</div>
+    <div class="pw-sub">Your rota is free forever. Upgrade to unlock the pay tools — built by someone who actually works the job.</div>
+    <div class="pw-feats">
+      <div class="pw-feat"><span class="fi">⏱</span><div><strong>Break times &amp; windows</strong> — SWAST rules applied</div></div>
+      <div class="pw-feat"><span class="fi">🛡</span><div><strong>End of shift protection</strong> — 60/30/5 min times</div></div>
+      <div class="pw-feat"><span class="fi">💷</span><div><strong>Estimated gross pay</strong> — per shift &amp; monthly total</div></div>
+      <div class="pw-feat"><span class="fi">🌙</span><div><strong>Social &amp; unsocial hours</strong> — full breakdown</div></div>
+      <div class="pw-feat"><span class="fi">⏰</span><div><strong>Overrun calculator</strong> — ×1.5 from minute 1</div></div>
+      <div class="pw-feat"><span class="fi">🤒</span><div><strong>Sick day pay scenarios</strong></div></div>
+      <div class="pw-feat"><span class="fi">🏖</span><div><strong>Annual leave pay tracker</strong></div></div>
+      <div class="pw-feat"><span class="fi">📊</span><div><strong>Export to Excel</strong> — full shift history</div></div>
+    </div>
+    <div class="pw-price">
+      <div class="pw-amount">£1.99</div>
+      <div class="pw-per">per month · cancel any time · <b>less than a coffee</b></div>
+    </div>
+    <button class="pw-btn" onclick="alert('Stripe coming soon — KineticShift Full launching shortly!')">Unlock KineticShift Full →</button>
+    <button class="pw-dismiss" id="pw-dismiss">Maybe later</button>
+    <div class="pw-tagline">"Know your worth."</div>
+  </div>
+</div>
+
+<!-- ═══ MANAGE SHIFTS MODAL ═══ -->
+<div id="manage-modal">
+  <div class="manage-sheet">
+    <div class="manage-hdr">
+      <div class="manage-title">Your Shift Types</div>
+      <button class="manage-x" id="manage-close">✕</button>
+    </div>
+    <div class="manage-sub">Name your own shifts and set their times. These appear as buttons when you tap any day on the calendar.</div>
+    <div class="shift-list" id="shift-list"></div>
+    <hr class="divider">
+    <div class="add-form-title">Add a new shift type</div>
+    <div class="form-row">
+      <label>Shift name</label>
+      <input type="text" id="new-name" placeholder="e.g. Days, Nights, RRV, Training..." maxlength="20">
+    </div>
+    <div class="form-row">
+      <label>Start time</label>
+      <input type="time" id="new-start" value="06:30">
+    </div>
+    <div class="form-row">
+      <label>Finish time</label>
+      <input type="time" id="new-finish" value="18:30">
+    </div>
+    <div class="form-row">
+      <label>Colour</label>
+      <div class="color-row" id="color-row"></div>
+    </div>
+    <button class="add-btn" id="add-shift-btn">+ Add Shift Type</button>
+  </div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="app-name">Kinetic<span>Shift</span><span class="lite-badge">LITE</span></div>
+      <div class="app-sub">Rota Planner · Free</div>
+    </div>
+    <div class="month-nav">
+      <button class="nav-btn" id="prev">‹</button>
+      <div class="month-label" id="month-label"></div>
+      <button class="nav-btn" id="next">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TODAY / TOMORROW ═══ -->
+<div class="tt-strip">
+  <div class="tt-card today-card" id="tt-today" onclick="jumpToToday()">
+    <div class="tt-when">Today</div>
+    <div id="tt-today-content"><div class="tt-none">No shift set</div></div>
+  </div>
+  <div class="tt-card tomorrow-card" id="tt-tomorrow" onclick="jumpToTomorrow()">
+    <div class="tt-when">Tomorrow</div>
+    <div id="tt-tomorrow-content"><div class="tt-none">No shift set</div></div>
+  </div>
+</div>
+
+<!-- ═══ TOOLBAR ═══ -->
+<div class="toolbar">
+  <div class="toolbar-left" id="legend-dots"></div>
+  <button class="manage-btn" id="manage-open-btn">⚙ Manage Shifts</button>
+</div>
+
+<!-- ═══ CALENDAR ═══ -->
+<div class="cal-section">
+  <div class="day-hdr">
+    <div class="dh">Mon</div><div class="dh">Tue</div><div class="dh">Wed</div>
+    <div class="dh">Thu</div><div class="dh">Fri</div><div class="dh">Sat</div><div class="dh">Sun</div>
+  </div>
+  <div class="cal-grid" id="cal"></div>
+</div>
+
+<!-- ═══ DETAIL PANEL ═══ -->
+<div class="detail-panel" id="detail">
+  <div class="dp-header">
+    <button class="dp-nav" id="dp-prev">‹</button>
+    <div class="dp-title" id="dp-title"></div>
+    <button class="dp-nav" id="dp-next">›</button>
+    <button class="dp-close" id="dp-close">✕</button>
+  </div>
+  <div class="dp-body">
+    <div class="dp-row">
+      <div class="dp-label">What's on?</div>
+      <div class="shift-btns" id="dp-shift-btns"></div>
+    </div>
+    <div id="dp-shift-info"></div>
+    <div class="unlock-row" onclick="showPaywall()" style="cursor:pointer">
+      <div class="unlock-txt">
+        <strong>Want break times, EoS &amp; pay?</strong>
+        Upgrade to KineticShift Full
+      </div>
+      <button class="unlock-btn-sm">£1.99/mo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ UPGRADE STRIP ═══ -->
+<div class="upgrade-strip">
+  <div class="us-left">
+    <div class="us-title">Want the full picture?</div>
+    <div class="us-sub">Break times · EoS · Pay estimates · Export</div>
+  </div>
+  <button class="us-btn" onclick="showPaywall()">£1.99/mo →</button>
+</div>
+
+<div class="footer-note">KineticShift Lite · Free rota planner · Data stays on your device</div>
+
+<script>
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_FULL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const COLOURS=['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#F97316','#06B6D4','#84CC16','#6366F1','#14B8A6','#A855F7'];
+
+// Default shift types
+const DEFAULT_TYPES=[
+  {id:'days',name:'Days',start:'06:30',finish:'18:30',colour:'#F59E0B'},
+  {id:'nights',name:'Nights',start:'18:30',finish:'06:30',colour:'#8B5CF6'},
+  {id:'off',name:'Off',start:'',finish:'',colour:'#10B981'},
+  {id:'sick',name:'Sick',start:'',finish:'',colour:'#EF4444'},
+  {id:'al',name:'A/L',start:'',finish:'',colour:'#3B82F6'},
+];
+
+const now=new Date();
+const todayDK=fmtDK(now);
+const tom=new Date(now);tom.setDate(now.getDate()+1);
+const tomorrowDK=fmtDK(tom);
+
+let vY=now.getFullYear(),vM=now.getMonth();
+let shifts={},shiftTypes=[],selKey=null,pickedColour=COLOURS[0];
+
+function fmtDK(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function dk(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function firstDow(y,m){let d=new Date(y,m,1).getDay();return d===0?6:d-1;}
+function daysIn(y,m){return new Date(y,m+1,0).getDate();}
+function toMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function calcH(s,f){const sm=toMins(s);let fm=toMins(f);if(fm<=sm)fm+=1440;return(fm-sm)/60;}
+
+// Paywall
+function showPaywall(){document.getElementById('paywall').classList.add('show');}
+function hidePaywall(){document.getElementById('paywall').classList.remove('show');}
+document.getElementById('pw-dismiss').addEventListener('click',hidePaywall);
+document.getElementById('paywall').addEventListener('click',e=>{if(e.target===document.getElementById('paywall'))hidePaywall();});
+
+// Manage modal
+document.getElementById('manage-open-btn').addEventListener('click',openManage);
+document.getElementById('manage-close').addEventListener('click',closeManage);
+document.getElementById('manage-modal').addEventListener('click',e=>{if(e.target===document.getElementById('manage-modal'))closeManage();});
+
+function openManage(){renderManage();document.getElementById('manage-modal').classList.add('show');}
+function closeManage(){document.getElementById('manage-modal').classList.remove('show');}
+
+function renderManage(){
+  // Shift list
+  const list=document.getElementById('shift-list');
+  if(shiftTypes.length===0){list.innerHTML='<div class="no-shifts-hint">No custom shifts yet — add one below</div>';return;}
+  list.innerHTML=shiftTypes.map((t,i)=>`
+    <div class="shift-item">
+      <div class="si-dot" style="background:${t.colour}"></div>
+      <div class="si-name">${t.name}</div>
+      <div class="si-time">${t.start&&t.finish?t.start+'–'+t.finish:'—'}</div>
+      <button class="si-del" onclick="deleteType(${i})">×</button>
+    </div>`).join('');
+
+  // Colour swatches
+  const cr=document.getElementById('color-row');
+  cr.innerHTML=COLOURS.map(c=>`<div class="swatch${c===pickedColour?' picked':''}" style="background:${c}" onclick="pickColour('${c}')"></div>`).join('');
+}
+
+function pickColour(c){pickedColour=c;renderManage();}
+
+function deleteType(i){
+  const id=shiftTypes[i].id;
+  shiftTypes.splice(i,1);
+  // Clear any days using this type
+  Object.keys(shifts).forEach(k=>{if(shifts[k]===id)delete shifts[k];});
+  save();render();renderManage();
+}
+
+document.getElementById('add-shift-btn').addEventListener('click',()=>{
+  const name=document.getElementById('new-name').value.trim();
+  if(!name){alert('Please enter a shift name.');return;}
+  const start=document.getElementById('new-start').value;
+  const finish=document.getElementById('new-finish').value;
+  const id='custom_'+Date.now();
+  shiftTypes.push({id,name,start,finish,colour:pickedColour});
+  document.getElementById('new-name').value='';
+  save();render();renderManage();
+});
+
+function getType(id){
+  return shiftTypes.find(t=>t.id===id)||DEFAULT_TYPES.find(t=>t.id===id)||null;
+}
+
+function getAllTypes(){return[...DEFAULT_TYPES,...shiftTypes];}
+
+// Legend dots
+function renderLegend(){
+  const el=document.getElementById('legend-dots');
+  el.innerHTML=getAllTypes().filter(t=>t.name!=='Off').map(t=>
+    `<div class="leg"><div class="leg-dot" style="background:${t.colour}"></div>${t.name}</div>`
+  ).join('');
+}
+
+// Today/tomorrow strip
+function renderTT(){
+  ['today','tomorrow'].forEach(which=>{
+    const key=which==='today'?todayDK:tomorrowDK;
+    const el=document.getElementById('tt-'+which+'-content');
+    const shId=shifts[key];
+    if(!shId){el.innerHTML='<div class="tt-none">No shift set</div>';return;}
+    const t=getType(shId);
+    if(!t){el.innerHTML='<div class="tt-none">No shift set</div>';return;}
+    const hasTime=t.start&&t.finish;
+    const hrs=hasTime?Math.round(calcH(t.start,t.finish)*10)/10:null;
+    el.innerHTML=`
+      <div class="tt-name" style="color:${t.colour}">${t.name}</div>
+      ${hasTime?`<div class="tt-time">${t.start} – ${t.finish}</div>`:''}
+      ${hrs?`<div class="tt-time">${hrs} hrs</div>`:''}`;
+  });
+}
+
+// Main calendar render
+function render(){
+  document.getElementById('month-label').textContent=`${MONTHS[vM]} ${vY}`;
+  const cal=document.getElementById('cal');cal.innerHTML='';
+  const fi=firstDow(vY,vM),di=daysIn(vY,vM);
+  for(let i=0;i<fi;i++){const e=document.createElement('div');e.className='cell empty';cal.appendChild(e);}
+  for(let d=1;d<=di;d++){
+    const key=dk(vY,vM,d);
+    const shId=shifts[key];
+    const t=shId?getType(shId):null;
+    const cell=document.createElement('div');
+    let cls='cell';
+    if(key===todayDK)cls+=' is-today';
+    else if(key===tomorrowDK)cls+=' is-tomorrow';
+    if(key===selKey)cls+=' selected';
+    cell.className=cls;
+    if(t){
+      cell.style.background=t.colour+'22';
+      cell.style.borderColor=t.colour+'88';
+    }
+    const hasTime=t&&t.start&&t.finish;
+    cell.innerHTML=`
+      <span class="cn" style="${t?'color:'+t.colour:''}">${d}</span>
+      ${t?`<span class="cl" style="color:${t.colour}">${t.name}</span>`:''}
+      ${hasTime?`<span class="ct">${t.start}–${t.finish}</span>`:''}`;
+    cell.addEventListener('click',()=>openDetail(key,vY,vM,d));
+    cal.appendChild(cell);
+  }
+  renderTT();
+  renderLegend();
+}
+
+function openDetail(key,y,m,d){
+  selKey=key;
+  const dw=new Date(y,m,d).getDay(),di=dw===0?6:dw-1;
+  const isToday=key===todayDK,isTom=key===tomorrowDK;
+  document.getElementById('dp-title').textContent=
+    `${isToday?'Today — ':isTom?'Tomorrow — ':''}${DAYS_FULL[di]} ${d} ${MONTHS[m]}`;
+  buildShiftBtns(key);
+  document.getElementById('detail').classList.add('open');
+  updateDetailInfo(key);
+  document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'start'});
+  render();
+}
+
+function buildShiftBtns(key){
+  const current=shifts[key];
+  const container=document.getElementById('dp-shift-btns');
+  const all=getAllTypes();
+  container.innerHTML='';
+  all.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='s-btn'+(current===t.id?' active':'');
+    if(current===t.id){btn.style.borderColor=t.colour;btn.style.background=t.colour+'22';btn.style.color=t.colour;}
+    btn.innerHTML=`<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${t.colour};flex-shrink:0"></span>${t.name}`;
+    btn.addEventListener('click',()=>{
+      shifts[key]=t.id;
+      save();buildShiftBtns(key);updateDetailInfo(key);render();
+    });
+    container.appendChild(btn);
+  });
+  // Clear button
+  const clr=document.createElement('button');
+  clr.className='s-btn s-btn-clear';
+  clr.textContent='Clear';
+  clr.addEventListener('click',()=>{delete shifts[key];save();buildShiftBtns(key);updateDetailInfo(key);render();});
+  container.appendChild(clr);
+}
+
+function updateDetailInfo(key){
+  const shId=shifts[key];
+  const el=document.getElementById('dp-shift-info');
+  if(!shId){el.innerHTML='';return;}
+  const t=getType(shId);
+  if(!t||!t.start||!t.finish){el.innerHTML='';return;}
+  const hrs=Math.round(calcH(t.start,t.finish)*10)/10;
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:12px;color:var(--txt2)">Shift</span>
+        <span style="font-size:13px;font-weight:700;color:${t.colour}">${t.name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:12px;color:var(--txt2)">Start</span>
+        <span style="font-size:13px;font-weight:600;font-family:'DM Mono',monospace">${t.start}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:12px;color:var(--txt2)">Finish</span>
+        <span style="font-size:13px;font-weight:600;font-family:'DM Mono',monospace">${t.finish}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px">
+        <span style="font-size:12px;color:var(--txt2)">Length</span>
+        <span style="font-size:13px;font-weight:600;font-family:'DM Mono',monospace">${hrs} hrs</span>
+      </div>
+    </div>`;
+}
+
+// Day navigation
+function navigateDay(dir){
+  if(!selKey)return;
+  const[y,m,d]=selKey.split('-').map(Number);
+  const date=new Date(y,m-1,d);date.setDate(date.getDate()+dir);
+  openDetail(fmtDK(date),date.getFullYear(),date.getMonth(),date.getDate());
+}
+document.getElementById('dp-prev').addEventListener('click',()=>navigateDay(-1));
+document.getElementById('dp-next').addEventListener('click',()=>navigateDay(1));
+document.getElementById('dp-close').addEventListener('click',()=>{
+  document.getElementById('detail').classList.remove('open');selKey=null;render();
+});
+document.getElementById('prev').addEventListener('click',()=>{if(vM===0){vY--;vM=11;}else vM--;render();});
+document.getElementById('next').addEventListener('click',()=>{if(vM===11){vY++;vM=0;}else vM++;render();});
+
+function jumpToToday(){vY=now.getFullYear();vM=now.getMonth();render();openDetail(todayDK,now.getFullYear(),now.getMonth(),now.getDate());}
+function jumpToTomorrow(){vY=tom.getFullYear();vM=tom.getMonth();render();openDetail(tomorrowDK,tom.getFullYear(),tom.getMonth(),tom.getDate());}
+
+// Persist
+function save(){
+  try{
+    localStorage.setItem('ks-lite-shifts',JSON.stringify(shifts));
+    localStorage.setItem('ks-lite-types',JSON.stringify(shiftTypes));
+  }catch(e){}
+}
+function load(){
+  try{const s=localStorage.getItem('ks-lite-shifts');if(s)shifts=JSON.parse(s);}catch(e){}
+  try{const s=localStorage.getItem('ks-lite-types');if(s)shiftTypes=JSON.parse(s);}catch(e){}
+  render();
+}
+load();
+</script>
+</body>
+</html>
